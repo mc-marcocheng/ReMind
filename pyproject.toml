@@ -1,0 +1,52 @@
+[project]
+name = "remind-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "bokeh>=3.7.3",
+    "conformer>=0.3.2",
+    "diffusers>=0.33.1",
+    "docling>=2.34.0",
+    "dotenv>=0.9.9",
+    "gradio>=5.31.0",
+    "langchain-anthropic>=0.3.14",
+    "langchain-community>=0.3.21",
+    "langchain-google-genai>=2.1.4",
+    "langchain-google-vertexai>=2.0.24",
+    "langchain-groq>=0.3.2",
+    "langchain-ollama>=0.3.3",
+    "langchain-openai>=0.3.18",
+    "langgraph>=0.4.7",
+    "librosa>=0.11.0",
+    "loguru>=0.7.3",
+    "nemo-toolkit[asr]>=1.23.0",
+    "omegaconf>=2.3.0",
+    "onnx==1.16.1",
+    "pymongo>=4.13.0",
+    "s3tokenizer>=0.1.7",
+    "tiktoken>=0.9.0",
+    "torch>=2.6.0",
+    "torchaudio>=2.6.0",
+    "torchvision>=0.21.0",
+    "transformers>=4.42.4",
+    "youtube-transcript-api>=1.0.3",
+    "yt-dlp>=2025.5.22",
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchaudio = [
+  { index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+  { index = "pytorch-cu124", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true

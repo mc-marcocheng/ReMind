@@ -1,0 +1,51 @@
+# GOAL
+
+Convert raw question and answer pairs into JSON format.
+
+# RAW QUESTION ANSWER PAIRS
+
+Raw question answer pairs:
+{{question_answer_raw}}
+
+# EXAMPLE
+
+Raw question answer pairs:
+Main concept 1: main concept 1
+- Question 1: generated question 1
+- Model answer 1: model answer 1
+
+- Question 2: generated question 2
+- Model answer 2: model answer 2
+
+- Question 3: generated question 3
+- Model answer 3: model answer 3
+
+Your answer could be something like:
+
+```json
+{
+    "question_answer_pairs": [
+        {
+            "question": "generated question 1",
+            "answer": "model answer 1"
+        },
+        {
+            "question": "generated question 2",
+            "answer": "model answer 2"
+        },
+        {
+            "question": "generated question 3",
+            "answer": "model answer 3"
+        }
+    ]
+}
+```
+
+# OUTPUT FORMATTING
+
+{{format_instructions}}
+
+- Do not include any text other than the JSON object
+- Do not include ```json``` in the response
+
+# ANSWER
