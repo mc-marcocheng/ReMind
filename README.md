@@ -93,6 +93,10 @@ You can ask any questions in "🤔 Ask" tab. The Teacher chatbot will search thr
 
 You can click on any date on the activity chart to check out all the notes on that day.
 
+### Listen to your Notes
+
+![listen_note](assets/listen_note.png)
+
 ## Acknowledgements
 
 - [Bokeh Activity Chart](https://discourse.bokeh.org/t/heatmap-calendar/12237)
