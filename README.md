@@ -2,7 +2,7 @@
 
 ReMind, your ultimate study companion app designed to revolutionize the way you learn and retain information. Whether you're a student, a professional, or a lifelong learner, ReMind is here to reinvigorate your study sessions and help you reach your educational goals. Rediscover the joy of learning with our innovative features that are tailored to enhance your study experience. ReMind not only helps you retain information but also reinforces your knowledge through strategic quizzes, ensuring that what you learn today remains with you tomorrow.
 
-## Features
+## ⚡ Features
 
 - **Seamless Content Parsing**: Effortlessly convert PDF, DOCX, XLSX, HTML, YouTube, webpages, and more into your personalized notes.
 - **Customizable Note Transformations**: Transform your notes into key points, summaries, or any format you desire. Design how AI should reshape your notes to fit your learning style.
@@ -15,7 +15,7 @@ ReMind, your ultimate study companion app designed to revolutionize the way you 
 
 ReMind is here to reshape your study habits, helping you retain, reinforce, and rediscover the joy of learning.
 
-## Setup
+## 📦 Setup
 
 1. Set up MongoDB Altas with Atlas CLI (required for vector search):
 
@@ -54,7 +54,7 @@ uv run webui.py
 
 Open http://localhost:7860 in your browser.
 
-## WebUI
+## 🔗 WebUI
 
 ### Add AI Models
 

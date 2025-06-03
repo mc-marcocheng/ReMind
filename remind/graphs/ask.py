@@ -164,7 +164,7 @@ async def call_model_with_messages(state: ThreadState, config: RunnableConfig) -
         "tools",
         max_tokens=2000,
     )
-    ai_message = (model | parser).invoke(system_prompt)
+    ai_message = await (model | parser).ainvoke(system_prompt)
     return {"strategy": ai_message}
 
 
@@ -209,7 +209,7 @@ async def provide_answer(state: SubGraphState, config: RunnableConfig) -> dict:
         "tools",
         max_tokens=2000,
     )
-    ai_message = model.invoke(system_prompt)
+    ai_message = await model.ainvoke(system_prompt)
     return {"answers": [ai_message.content]}
 
 async def write_final_answer(state: ThreadState, config: RunnableConfig) -> dict:
@@ -221,7 +221,7 @@ async def write_final_answer(state: ThreadState, config: RunnableConfig) -> dict
         "tools",
         max_tokens=2000,
     )
-    ai_message = model.invoke(system_prompt)
+    ai_message = await model.ainvoke(system_prompt)
     return {"final_answer": ai_message.content}
 
 

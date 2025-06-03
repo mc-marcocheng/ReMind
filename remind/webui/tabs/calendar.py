@@ -29,14 +29,6 @@ def create_activity_chart(year: int):
     filter = {"created": {"$gte": datetime(year, 1, 1), "$lt": datetime(year + 1, 1, 1)}}
     documents = collection_query("source", filter)
     values = [0] * days_in_year
-    base = np.random.normal(50, 20, size=365)
-    weekday_boost = np.array([1.4 if d.weekday() < 5 else 0.6 for d in dates])
-    seasonal_pattern = np.sin(np.linspace(0, 2*np.pi, 365)) * 15 + 5
-    monthly_pattern = np.sin(np.linspace(0, 24*np.pi, 365)) * 10
-    trend = np.linspace(0, 20, 365)
-
-    values = (base * weekday_boost + seasonal_pattern + monthly_pattern + trend)
-    values = np.clip(values, 0, 100).astype(int)
     note_cnt = [0] * days_in_year
 
     # Process each document to count topics per day
