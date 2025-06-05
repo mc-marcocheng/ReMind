@@ -117,7 +117,7 @@ def transformations_tab(demo, all_models: gr.State):
                     input_text = gr.TextArea(label="Enter some text", placeholder="Enter text here")
                     run_button = gr.Button("Run")
                     output_text = gr.Markdown()
-                    run_button.click(
+                    run_button.click(lambda: gr.Info("Transforming...", 2)).then(
                         run_transformation,
                         inputs=[transformation_name, model_key, input_text],
                         outputs=output_text,

@@ -3,11 +3,13 @@ Classes for supporting different transcription models
 """
 
 import gc
+import tempfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
 import torch
+from pydub import AudioSegment
 
 
 @dataclass
@@ -73,13 +75,27 @@ class ParakeetSpeechToTextModel(SpeechToTextModel):
         Transcribes an audio file into text
         """
         import nemo.collections.asr as nemo_asr
-
         asr_model = nemo_asr.models.ASRModel.from_pretrained(model_name="nvidia/parakeet-tdt-0.6b-v2")
 
-        # output = asr_model.transcribe(['2086-149220-0033.wav'])
-        output = asr_model.transcribe([audio_file_path])
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Split the audio file into segments as the audio file maybe too long
+            audio = AudioSegment.from_file(audio_file_path)
+            segment_length = 450000  # 450 seconds in milliseconds
+            segment_files = []
+
+            for i, segment in enumerate(audio[::segment_length]):
+                segment_file_path = f"{tmp_dir}/segment_{i}.mp3"
+                segment.export(segment_file_path, format="mp3")
+                segment_files.append(segment_file_path)
+
+            all_transcripts = []
+            for segment_file in segment_files:
+                output = asr_model.transcribe([segment_file])
+                all_transcripts.append(output[0].text)
+
         del asr_model
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        return output[0].text
+
+        return " ".join(all_transcripts)

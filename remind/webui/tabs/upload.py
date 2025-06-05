@@ -33,7 +33,7 @@ def upload_tab(calendar_update):
 
                 with gr.Tabs():
                     with gr.Tab("File"):
-                        gr.Markdown("Supports PDF, DOCX, XLSX, PPTX, AsciiDoc, HTML, XHTML, CSV.")
+                        gr.Markdown("Supports PDF, DOCX, XLSX, PPTX, AsciiDoc, HTML, XHTML, CSV, video file.")
                         file = gr.File()
                         file.clear(lambda: ("", ""), outputs=[file_path, url])
                         file_convert_button = gr.Button("Convert to Text")

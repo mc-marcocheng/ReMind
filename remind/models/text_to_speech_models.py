@@ -62,6 +62,7 @@ class TextToSpeechModel(ABC):
 class ChatterboxTextToSpeechModel(TextToSpeechModel):
     model_name: str
 
+    @staticmethod
     def chunk_transcript(text: str, chunk_size: int) -> list[str]:
         chunker = semchunk.chunkerify("o200k_base", chunk_size=chunk_size) # 40 second speech limit
         chunks = chunker(text)
