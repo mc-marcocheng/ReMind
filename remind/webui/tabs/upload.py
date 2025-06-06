@@ -14,6 +14,8 @@ from remind.process_content.url_to_text import (firecrawl_url_to_text,
                                                 url_to_text)
 from remind.process_content.youtube_to_text import (
     retrieve_youtube_transcript, stt_youtube_audio)
+from remind.webui.components.markdown_latex_render import \
+    GR_MARKDOWN_LATEX_DELIMITERS
 
 
 def update_file_path(file_path):
@@ -54,7 +56,7 @@ def upload_tab(calendar_update):
 
                 with gr.Accordion("Edit Note Content", open=False):
                     note_text = gr.TextArea(label="Note Content", interactive=True, container=False)
-                note_markdown = gr.Markdown(show_label=False)
+                note_markdown = gr.Markdown(show_label=False, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                 note_text.change(lambda x: x, inputs=[note_text], outputs=[note_markdown])
 
                 file_convert_button.click(lambda: gr.Info("Converting file...", duration=2)).then(

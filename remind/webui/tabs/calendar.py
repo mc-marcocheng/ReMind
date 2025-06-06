@@ -15,6 +15,8 @@ from remind.database.mongodb import collection_query
 from remind.domain.notes import Source
 from remind.process_content.text_to_speech import \
     generate_audio_from_transcript
+from remind.webui.components.markdown_latex_render import \
+    GR_MARKDOWN_LATEX_DELIMITERS
 
 curdoc().theme = 'dark_minimal'
 
@@ -207,7 +209,7 @@ def calendar_tab(demo, calendar_update):
             for note in notes:
                 with gr.Accordion(note.title, open=False):
                     with gr.Accordion("Content", open=True):
-                        gr.Markdown(note.full_text)
+                        gr.Markdown(note.full_text, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                         # Note to Audio
                         with gr.Row() as note_speak_button_row:
                             note_speak_button = gr.Button("Speak", scale=0)
@@ -220,7 +222,7 @@ def calendar_tab(demo, calendar_update):
                         )
                     for insight in note.insights:
                         with gr.Accordion(insight.insight_type, open=True):
-                            gr.Markdown(insight.content)
+                            gr.Markdown(insight.content, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                             # Insight to Audio
                             with gr.Row() as insight_speak_button_row:
                                 insight_speak_button = gr.Button("Speak", scale=0)

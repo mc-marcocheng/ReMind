@@ -8,6 +8,8 @@ from remind.process_content.get_quiz import (get_hint, get_next_quiz_note,
                                              get_quiz_question_answer_pairs,
                                              judge_correctness,
                                              save_quizzed_note)
+from remind.webui.components.markdown_latex_render import \
+    GR_MARKDOWN_LATEX_DELIMITERS
 
 
 def get_next_question(note, question_idx, question_answer_pairs: list[QuestionAnswer]):
@@ -84,14 +86,14 @@ def quiz_tab():
                         return
                     with gr.Accordion(note.title, open=False):
                         with gr.Accordion("Content", open=True):
-                            gr.Markdown(note.full_text)
+                            gr.Markdown(note.full_text, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                         for insight in note.insights:
                             with gr.Accordion(insight.insight_type, open=True):
-                                gr.Markdown(insight.content)
+                                gr.Markdown(insight.content, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
 
                 get_hint_button = gr.Button("Get Hint", visible=False)
                 with gr.Accordion("Hint", open=True, visible=False) as hint_display_accordion:
-                    hint_display = gr.Markdown()
+                    hint_display = gr.Markdown(latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
 
             # Quiz and Judge column
             with gr.Column():
@@ -101,9 +103,9 @@ def quiz_tab():
                     answer_text = gr.TextArea(label="Answer")
                     submit_button = gr.Button("Submit")
                 with gr.Group(visible=False) as judged_group:
-                    judged_display = gr.Markdown()
+                    judged_display = gr.Markdown(latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                     with gr.Accordion("Model Answer", open=True):
-                        model_answer = gr.Markdown()
+                        model_answer = gr.Markdown(latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
                     next_question_button = gr.Button("Next Question")
 
 
