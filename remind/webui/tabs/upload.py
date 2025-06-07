@@ -126,7 +126,7 @@ def upload_tab(calendar_update):
                         for transformation, transformation_text in zip(all_transformations, transformation_texts):
                             source.add_insight(transformation.name, transformation_text)
 
-                    save_note_button.click(
+                    save_note_button.click(lambda: gr.Info("Saving...", 2)).then(
                         save_note,
                         inputs=[note_title, note_topics, *all_transformation_textareas],
                     ).then(

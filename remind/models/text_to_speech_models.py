@@ -75,7 +75,7 @@ class ChatterboxTextToSpeechModel(TextToSpeechModel):
             model = ChatterboxTTS.from_pretrained(device=device)
             match self.model_name:
                 case "female":
-                    chunk_size = 120
+                    chunk_size = 110
                     model.prepare_conditionals(Path(__file__).parent / "chatterbox" / "audio_samples" / "female.mp3")
                 case _:
                     chunk_size = 130
