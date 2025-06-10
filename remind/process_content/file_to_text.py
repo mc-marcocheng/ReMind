@@ -13,8 +13,14 @@ converter = DocumentConverter()
 
 def file_to_text(file) -> str:
     """ Convert file to markdown. """
+    # Markdown file
+    if Path(file).suffix == ".md":
+        with open(file, "r", encoding="utf-8") as f:
+            return f.read()
+    # Video file
     if Path(file).suffix.lstrip(".") in VIDEO_EXTENSIONS:
         return video_to_text(file)
+    # Others
     result = converter.convert(file)
     return result.document.export_to_markdown()
 

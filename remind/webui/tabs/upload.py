@@ -57,7 +57,7 @@ def upload_tab(calendar_update):
                 with gr.Accordion("Edit Note Content", open=False):
                     note_text = gr.TextArea(label="Note Content", interactive=True, container=False)
                 note_markdown = gr.Markdown(show_label=False, latex_delimiters=GR_MARKDOWN_LATEX_DELIMITERS)
-                note_text.change(lambda x: x, inputs=[note_text], outputs=[note_markdown])
+                note_text.change(lambda x: x, inputs=[note_text], outputs=[note_markdown], show_progress=False)
 
                 file_convert_button.click(lambda: gr.Info("Converting file...", duration=2)).then(
                     file_to_text, inputs=[file], outputs=[note_text]
@@ -110,7 +110,7 @@ def upload_tab(calendar_update):
                         transformation_output_textarea = gr.TextArea(transformation_output_text, label=transformation.name, interactive=True, info=transformation.description)
                         all_transformation_textareas.append(transformation_output_textarea)
                     topics = topics_graph.invoke(dict(input_text=input_text))["output"]
-                    note_topics = gr.Dropdown(topics, value=topics, multiselect=True, label="Topics", interactive=True)
+                    note_topics = gr.Dropdown(topics, value=topics, multiselect=True, label="Topics", interactive=True, allow_custom_value=True)
 
                     save_note_button = gr.Button("Save Note")
 
