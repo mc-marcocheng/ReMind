@@ -32,7 +32,7 @@ def get_next_quiz_note() -> Optional[Source]:
     all_sources = collection_query("source", filter={"created": {"$gte": date_threshold}})
     today_quizzed = get_today_quizzed()
     for source in all_sources:
-        if source["_id"] in today_quizzed:
+        if source["_id"] in today_quizzed.quizzed:
             # Skip notes that are already quizzed today
             continue
         source_id = str(source["_id"])
