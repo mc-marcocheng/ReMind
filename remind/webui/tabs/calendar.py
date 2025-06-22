@@ -1,9 +1,9 @@
 import calendar
+import re
 from datetime import datetime, timedelta
 from functools import partial
 
 import gradio as gr
-import numpy as np
 import pandas as pd
 from bokeh.io import curdoc
 from bokeh.models import (ColumnDataSource, CustomJS, HoverTool, Label,
@@ -21,7 +21,7 @@ from remind.webui.components.markdown_latex_render import \
 curdoc().theme = 'dark_minimal'
 
 
-def create_activity_chart(year: int):
+def create_activity_chart(year: int, topics_filter: list[str]):
     # Generate data for the specified year
     start_date = datetime(year, 1, 1)
     days_in_year = 366 if calendar.isleap(year) else 365
@@ -29,6 +29,12 @@ def create_activity_chart(year: int):
 
     # Retrieve all documents for the specified year from the "source" collection
     filter = {"created": {"$gte": datetime(year, 1, 1), "$lt": datetime(year + 1, 1, 1)}}
+
+    # Filter topics if topics_filter is not empty
+    if topics_filter:
+        regex_topics_filter = [re.compile(topic, re.IGNORECASE) for topic in topics_filter]
+        filter["topics"] = {"$in": regex_topics_filter}
+
     documents = collection_query("source", filter)
     values = [0] * days_in_year
     note_cnt = [0] * days_in_year
@@ -185,26 +191,62 @@ def create_activity_chart(year: int):
 
     return p
 
+def natural_sort(l):
+    # https://stackoverflow.com/a/4836734
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
+
 def calendar_tab(demo, calendar_update):
     with gr.Tab("📅 Calendar"):
         with gr.Row():
-            gr.Textbox("Year", container=False, scale=0, min_width=60)
-            current_year = gr.Number(label="Year", container=False, min_width=80, scale=0)
-            gr.Markdown()
-        gr.Markdown("Click on a day in Calendar to see notes for that day.")
+            with gr.Column(scale=0):
+                with gr.Row():
+                    gr.Textbox("Year", container=False, scale=0, min_width=60)
+                    current_year = gr.Number(label="Year", container=False, min_width=80, scale=0)
+                    gr.Markdown()
+                gr.Markdown("Click on a day in Calendar to see notes for that day.")
+            with gr.Column():
+                topics_to_filter = gr.State()
+                demo.load(lambda: [], outputs=[topics_to_filter])
+                topics_to_filter.change(lambda: datetime.now(), outputs=[calendar_update])
+
+                @gr.render(inputs=[topics_to_filter], triggers=[calendar_update.change])
+                def topics_filter_dropdown(topics_filter: list[str]):
+                    # Get all topics from the source collection
+                    all_topics_raw = sum((source["topics"] for source in collection_query("source", {})), [])
+
+                    # Create a dictionary to maintain the first appearance of each topic in original form
+                    unique_topics = {}
+                    for topic in all_topics_raw:
+                        lower_topic = topic.lower()
+                        if lower_topic not in unique_topics:
+                            unique_topics[lower_topic] = topic  # Preserve the original form of the topic
+
+                    # Sort topics by their original form
+                    all_topics = natural_sort(unique_topics.values())
+
+                    note_topics_filter = gr.Dropdown(all_topics, value=topics_filter, multiselect=True, label="Filter by Topics", interactive=True, allow_custom_value=True)
+                    note_topics_filter.change(lambda x: x, inputs=[note_topics_filter], outputs=[topics_to_filter])
+
         calendar = gr.Plot(show_label=False)
         clicked_date = gr.Textbox(label="Clicked Date", elem_id="text_to_update", visible=False)
         demo.load(lambda: datetime.now().year, [], [current_year])
-        current_year.change(create_activity_chart, inputs=[current_year], outputs=[calendar])
-        calendar_update.change(create_activity_chart, inputs=[current_year], outputs=[calendar])
+        current_year.change(create_activity_chart, inputs=[current_year, topics_to_filter], outputs=[calendar])
+        calendar_update.change(create_activity_chart, inputs=[current_year, topics_to_filter], outputs=[calendar])
 
-        @gr.render(inputs=[clicked_date], triggers=[clicked_date.change, calendar_update.change])
-        def render_notes(date: str):
+        @gr.render(inputs=[clicked_date, topics_to_filter], triggers=[clicked_date.change, calendar_update.change])
+        def render_notes(date: str, topics_filter: list[str]):
             # Display all notes for the clicked date in the activity chart
             if not date:
                 return
             cur_date = datetime.strptime(date, "%Y-%m-%d")
-            notes = collection_query("source", {"created": {"$gte": cur_date, "$lt": cur_date + timedelta(days=1)}})
+            filter = {"created": {"$gte": cur_date, "$lt": cur_date + timedelta(days=1)}}
+            # Filter topics if topics_filter is not empty
+            if topics_filter:
+                regex_topics_filter = [re.compile(topic, re.IGNORECASE) for topic in topics_filter]
+                filter["topics"] = {"$in": regex_topics_filter}
+            notes = collection_query("source", filter)
             notes = [Source(**note) for note in notes]
             for note in notes:
                 with gr.Accordion(note.title, open=False):
