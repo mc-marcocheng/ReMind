@@ -35,8 +35,9 @@ def file_to_text(file, additional_files) -> str:
         return video_to_text(file)
     # Others
     pipeline_options = PdfPipelineOptions(
-        do_picture_description=True,
         enable_remote_services=True,
+        allow_external_plugins=True,
+        do_picture_description=True,
         picture_description_options=model_manager.vision_model.picture_description_options(),
         generate_picture_images=True,
     )

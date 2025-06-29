@@ -1,14 +1,15 @@
 [project]
-name = "remind-app"
+name = "remind"
 version = "0.1.0"
-description = "Add your description here"
+description = "Your ultimate study companion app that transforms notes, tags topics, quizzes for retention, and motivates daily learning."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "bokeh>=3.7.3",
     "conformer>=0.3.2",
     "diffusers>=0.33.1",
-    "docling>=2.34.0",
+    "docling>=2.39.0",
+    "docling-litellm-picture-description>=0.1.0",
     "dotenv>=0.9.9",
     "gradio>=5.31.0",
     "langchain-anthropic>=0.3.14",
@@ -20,7 +21,7 @@ dependencies = [
     "langchain-openai>=0.3.18",
     "langgraph>=0.4.7",
     "librosa>=0.11.0",
-    "litellm>=1.72.0",
+    "litellm>=1.73.6",
     "loguru>=0.7.3",
     "nemo-toolkit[asr]>=1.23.0",
     "omegaconf>=2.3.0",

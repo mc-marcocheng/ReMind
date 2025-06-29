@@ -1,4 +1,8 @@
+import os
 from typing import Dict, Type, Union
+
+import litellm
+import pydantic
 
 from remind.models.embedding_models import (EmbeddingModel,
                                             GeminiEmbeddingModel,
@@ -17,7 +21,10 @@ from remind.models.speech_to_text_models import (GroqSpeechToTextModel,
                                                  SpeechToTextModel)
 from remind.models.text_to_speech_models import (ChatterboxTextToSpeechModel,
                                                  TextToSpeechModel)
-from remind.models.vision_models import OllamaVisionModel, VisionModel
+from remind.models.vision_models import (LiteLLMVisionModel, OllamaVisionModel,
+                                         VisionModel)
+
+litellm.telemetry = pydantic.TypeAdapter(bool).validate_python(os.environ.get("LITELLM_TELEMETRY_ENABLED") or False)
 
 ModelType = Union[LanguageModel, VisionModel, EmbeddingModel, SpeechToTextModel, TextToSpeechModel]
 
@@ -39,6 +46,7 @@ MODEL_CLASS_MAP: Dict[str, ProviderMap] = {
     },
     "vision": {
         "ollama": OllamaVisionModel,
+        "litellm": LiteLLMVisionModel,
     },
     "embedding": {
         "openai": OpenAIEmbeddingModel,

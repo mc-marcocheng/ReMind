@@ -8,9 +8,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+import litellm
 import ollama
 from docling.datamodel.pipeline_options import (PictureDescriptionApiOptions,
                                                 PictureDescriptionBaseOptions)
+from docling_litellm_picture_description.datamodel.pipeline_options import \
+    PictureDescriptionLiteLLMOptions
+
+from remind.prompter import Prompter
 
 
 @dataclass
@@ -57,7 +62,7 @@ class OllamaVisionModel(VisionModel):
         return PictureDescriptionApiOptions(
             url=self.base_url.rstrip("/") + "/v1/chat/completions",
             params={"model": self.model_name},
-            prompt="""Provide a concise and accurate description of the image without introductory phrases such as "Here's a description of the image:".""",
+            prompt=Prompter(prompt_template="image_description").render(data={}),
             scale=1.0,
             timeout=120,
         )
@@ -66,10 +71,50 @@ class OllamaVisionModel(VisionModel):
         image_data = self.image_to_base64(image_path)
         response = ollama.generate(
             model=self.model_name,
-            prompt="""Provide a concise and accurate description of the image without introductory phrases such as "Here's a description of the image:".""",
+            prompt=Prompter(prompt_template="image_description").render(data={}),
             images=[image_data],    # Pass base64 encoded image data at top level
         )
 
         # Extract the caption from the response
         caption = response["response"].strip()
         return caption
+
+
+@dataclass
+class LiteLLMVisionModel(VisionModel):
+    """
+    Vision model that uses LiteLLM chat interface.
+    """
+
+    model_name: str
+
+    def picture_description_options(self) -> PictureDescriptionLiteLLMOptions:
+        return PictureDescriptionLiteLLMOptions(
+            model=self.model_name,
+            prompt=Prompter(prompt_template="image_description").render(data={}),
+            scale=1.0,
+            timeout=120,
+        )
+
+    def picture_description(self, image_path: str) -> str:
+        image_data = self.image_to_base64(image_path)
+        response = litellm.completion(
+            model=self.model_name,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": Prompter(prompt_template="image_description").render(data={}),
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": f"data:image/jpeg;base64,{image_data}",
+                        },
+                    ],
+                },
+            ],
+            timeout=120,
+        )
+        return response["choices"][0]["message"]["content"].strip()
