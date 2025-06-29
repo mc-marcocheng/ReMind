@@ -37,7 +37,9 @@ def upload_tab(calendar_update):
                     with gr.Tab("File"):
                         gr.Markdown("Supports PDF, DOCX, XLSX, PPTX, AsciiDoc, HTML, XHTML, CSV, video file.")
                         file = gr.File()
+                        additional_files = gr.File(file_count="multiple", label="Additional Files", visible=False)
                         file.clear(lambda: ("", ""), outputs=[file_path, url])
+                        file.change(lambda file: gr.File(None, visible=bool(file) and Path(file).suffix == ".md"), inputs=[file], outputs=[additional_files])
                         file_convert_button = gr.Button("Convert to Text")
 
                     with gr.Tab("YouTube"):
@@ -60,7 +62,7 @@ def upload_tab(calendar_update):
                 note_text.change(lambda x: x, inputs=[note_text], outputs=[note_markdown], show_progress=False)
 
                 file_convert_button.click(lambda: gr.Info("Converting file...", duration=2)).then(
-                    file_to_text, inputs=[file], outputs=[note_text]
+                    file_to_text, inputs=[file, additional_files], outputs=[note_text]
                 ).then(
                     update_file_path, inputs=[file], outputs=[file_path, url]
                 )

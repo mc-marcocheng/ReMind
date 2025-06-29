@@ -3,7 +3,8 @@ from typing import ClassVar, Dict, Optional
 from remind.database.mongodb import collection_query
 from remind.domain.base import ObjectModel, PyObjectId, RecordModel
 from remind.models import (MODEL_CLASS_MAP, EmbeddingModel, LanguageModel,
-                           ModelType, SpeechToTextModel, TextToSpeechModel)
+                           ModelType, SpeechToTextModel, TextToSpeechModel,
+                           VisionModel)
 
 
 class Model(ObjectModel):
@@ -23,9 +24,9 @@ class DefaultModels(RecordModel):
     default_chat_model: Optional[PyObjectId] = None
     default_transformation_model: Optional[PyObjectId] = None
     default_large_context_model: Optional[PyObjectId] = None
+    default_vision_model: Optional[PyObjectId] = None
     default_text_to_speech_model: Optional[PyObjectId] = None
     default_speech_to_text_model: Optional[PyObjectId] = None
-    # default_vision_model: Optional[PyObjectId]
     default_embedding_model: Optional[PyObjectId] = None
     default_tools_model: Optional[PyObjectId] = None
 
@@ -55,7 +56,7 @@ class ModelManager:
             cached_model = self._model_cache[cache_key]
             if not isinstance(
                 cached_model,
-                (LanguageModel, EmbeddingModel, SpeechToTextModel, TextToSpeechModel),
+                (LanguageModel, VisionModel, EmbeddingModel, SpeechToTextModel, TextToSpeechModel),
             ):
                 raise TypeError(
                     f"Cached model is of unexpected type: {type(cached_model)}"
@@ -93,6 +94,18 @@ class ModelManager:
             if not self._default_models:
                 raise RuntimeError("Failed to initialize default models configuration")
         return self._default_models
+
+    @property
+    def vision_model(self, **kwargs) -> Optional[VisionModel]:
+        """Get the default vision model"""
+        model_id = self.defaults.default_vision_model
+        if not model_id:
+            return None
+        model = self.get_model(model_id, **kwargs)
+        assert model is None or isinstance(
+            model, VisionModel
+        ), f"Expected VisionModel but got {type(model)}"
+        return model
 
     @property
     def speech_to_text(self, **kwargs) -> Optional[SpeechToTextModel]:
@@ -151,14 +164,16 @@ class ModelManager:
             model_id = (
                 self.defaults.default_tools_model or self.defaults.default_chat_model
             )
+        elif model_type == "large_context":
+            model_id = self.defaults.large_context_model
+        elif model_type == "vision":
+            model_id = self.defaults.default_vision_model
         elif model_type == "embedding":
             model_id = self.defaults.default_embedding_model
         elif model_type == "text_to_speech":
             model_id = self.defaults.default_text_to_speech_model
         elif model_type == "speech_to_text":
             model_id = self.defaults.default_speech_to_text_model
-        elif model_type == "large_context":
-            model_id = self.defaults.large_context_model
 
         if not model_id:
             return None

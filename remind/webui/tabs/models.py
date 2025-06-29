@@ -12,8 +12,8 @@ from remind.webui.components.model_selector import (get_model_from_key,
 provider_status = {}
 
 model_types = [
-    # "vision",
     "language",
+    "vision",
     "embedding",
     "text_to_speech",
     "speech_to_text",
@@ -72,6 +72,7 @@ def save_default_models(
         transformation_model_key: str,
         tools_model_key: str,
         large_context_model_key: str,
+        vision_model_key: str,
         text_to_speech_model_key: str,
         speech_to_text_model_key: str,
         embedding_model_key: str
@@ -84,6 +85,8 @@ def save_default_models(
     default_models.default_tools_model = default_tools_model.id if default_tools_model else None
     default_large_context_model = get_model_from_key(large_context_model_key, "language")
     default_models.default_large_context_model = default_large_context_model.id if default_large_context_model else None
+    default_vision_model = get_model_from_key(vision_model_key, "vision")
+    default_models.default_vision_model = default_vision_model.id if default_vision_model else None
     default_text_to_speech_model = get_model_from_key(text_to_speech_model_key, "text_to_speech")
     default_models.default_text_to_speech_model = default_text_to_speech_model.id if default_text_to_speech_model else None
     default_speech_to_text_model = get_model_from_key(speech_to_text_model_key, "speech_to_text")
@@ -177,6 +180,12 @@ def models_tab(demo, all_models):
                         model_type="language",
                         info="This model will be used for larger context generation.",
                     )
+                    vision_model_key = model_selector(
+                        label="Default Vision Model",
+                        selected_id=default_models.default_vision_model,
+                        model_type="vision",
+                        info="This model will be used for image annotation.",
+                    )
                     text_to_speech_model_key = model_selector(
                         label="Default Text to Speech Model",
                         selected_id=default_models.default_text_to_speech_model,
@@ -204,6 +213,7 @@ def models_tab(demo, all_models):
                             transformation_model_key,
                             tools_model_key,
                             large_context_model_key,
+                            vision_model_key,
                             text_to_speech_model_key,
                             speech_to_text_model_key,
                             embedding_model_key,

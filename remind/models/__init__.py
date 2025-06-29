@@ -17,8 +17,9 @@ from remind.models.speech_to_text_models import (GroqSpeechToTextModel,
                                                  SpeechToTextModel)
 from remind.models.text_to_speech_models import (ChatterboxTextToSpeechModel,
                                                  TextToSpeechModel)
+from remind.models.vision_models import OllamaVisionModel, VisionModel
 
-ModelType = Union[LanguageModel, EmbeddingModel, SpeechToTextModel, TextToSpeechModel]
+ModelType = Union[LanguageModel, VisionModel, EmbeddingModel, SpeechToTextModel, TextToSpeechModel]
 
 
 ProviderMap = Dict[str, Type[ModelType]]
@@ -35,6 +36,9 @@ MODEL_CLASS_MAP: Dict[str, ProviderMap] = {
         "gemini": GeminiLanguageModel,
         "xai": XAILanguageModel,
         "groq": GroqLanguageModel,
+    },
+    "vision": {
+        "ollama": OllamaVisionModel,
     },
     "embedding": {
         "openai": OpenAIEmbeddingModel,
@@ -54,8 +58,9 @@ MODEL_CLASS_MAP: Dict[str, ProviderMap] = {
 
 __all__ = [
     "MODEL_CLASS_MAP",
-    "EmbeddingModel",
     "LanguageModel",
+    "VisionModel",
+    "EmbeddingModel",
     "SpeechToTextModel",
     "TextToSpeechModel",
     "ModelType",

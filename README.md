@@ -62,6 +62,7 @@ Go to the "🤖 Models" tab. Configure your AI models there.
 
 Local AI Recommendations:
 - LLM: Provider Ollama, model name: [phi4](https://ollama.com/library/phi4)
+- Vision: Provider Ollama, model name: [gemma3](https://ollama.com/library/gemma3)
 - Embedding: Provider Ollama, model name: [bge-m3](https://ollama.com/library/bge-m3)
 - Speech-to-text: Provider [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2), model name: nvidia/parakeet-tdt-0.6b-v2
 - Text-to-speech: Provider [Chatterbox](https://huggingface.co/ResembleAI/chatterbox), model name: default male or female. You can add your own voice.
