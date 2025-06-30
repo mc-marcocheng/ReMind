@@ -8,6 +8,7 @@ from docling.datamodel.base_models import FormatToExtensions, InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.doc.document import PictureDescriptionData
+from PIL import Image
 
 from remind.domain.models import model_manager
 
@@ -33,6 +34,13 @@ def file_to_text(file, additional_files) -> str:
     # Video file
     if Path(file).suffix.lstrip(".").lower() in VIDEO_EXTENSIONS:
         return video_to_text(file)
+    # GIF file
+    if Path(file).suffix.lstrip(".").lower() == "gif":
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_png_path = f"{tmp_dir}/tmp.png"
+            img = Image.open(file)
+            img.convert("RGB").save(tmp_png_path)
+            return file_to_text(tmp_png_path, [])
     # Others
     pipeline_options = PdfPipelineOptions(
         enable_remote_services=True,
