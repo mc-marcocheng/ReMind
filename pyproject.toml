@@ -26,6 +26,7 @@ dependencies = [
     "nemo-toolkit[asr]>=1.23.0",
     "omegaconf>=2.3.0",
     "onnx==1.16.1",
+    "pillow>=11.3",
     "pyimgur>=0.8.1",
     "pymongo>=4.13.0",
     "s3tokenizer>=0.1.7",

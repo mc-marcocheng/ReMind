@@ -34,8 +34,8 @@ def file_to_text(file, additional_files) -> str:
     # Video file
     if Path(file).suffix.lstrip(".").lower() in VIDEO_EXTENSIONS:
         return video_to_text(file)
-    # GIF file
-    if Path(file).suffix.lstrip(".").lower() == "gif":
+    # GIF or AVIF file
+    if Path(file).suffix.lstrip(".").lower() in ("gif", "avif"):
         with tempfile.TemporaryDirectory() as tmp_dir:
             tmp_png_path = f"{tmp_dir}/tmp.png"
             img = Image.open(file)
