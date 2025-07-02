@@ -2,6 +2,7 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
+from typing import Optional
 
 import gradio as gr
 from docling.datamodel.base_models import FormatToExtensions, InputFormat
@@ -17,7 +18,7 @@ from .upload_image import upload_image
 VIDEO_EXTENSIONS = set(('webm', 'mkv', 'flv', 'vob', 'ogv', 'ogg', 'rrc', 'gifv', 'mng', 'mov', 'avi', 'qt', 'wmv', 'yuv', 'rm', 'asf', 'amv', 'mp4', 'm4p', 'm4v', 'mpg', 'mp2', 'mpeg', 'mpe', 'mpv', 'm4v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'flv', 'f4v', 'f4p', 'f4a', 'f4b', 'mod'))
 IMAGE_EXTENSIONS = set(FormatToExtensions[InputFormat.IMAGE])
 
-def file_to_text(file, additional_files) -> str:
+def file_to_text(file, additional_files: Optional[list] = None) -> str:
     """ Convert file to markdown. """
     # Markdown file
     if Path(file).suffix == ".md":
@@ -27,9 +28,9 @@ def file_to_text(file, additional_files) -> str:
             for additional_file in additional_files:
                 obsidian_link = f"![[{Path(additional_file).name}]]"
                 if obsidian_link in markdown_text:
-                    markdown_text = markdown_text.replace(obsidian_link, file_to_text(additional_file, []))
+                    markdown_text = markdown_text.replace(obsidian_link, file_to_text(additional_file))
                 else:
-                    markdown_text += f"\n\n`{Path(additional_file).name}`:\n{file_to_text(additional_file, [])}"
+                    markdown_text += f"\n\n`{Path(additional_file).name}`:\n{file_to_text(additional_file)}"
         return markdown_text
     # Video file
     if Path(file).suffix.lstrip(".").lower() in VIDEO_EXTENSIONS:
@@ -40,7 +41,7 @@ def file_to_text(file, additional_files) -> str:
             tmp_png_path = f"{tmp_dir}/tmp.png"
             img = Image.open(file)
             img.convert("RGB").save(tmp_png_path)
-            return file_to_text(tmp_png_path, [])
+            return file_to_text(tmp_png_path)
     # Others
     pipeline_options = PdfPipelineOptions(
         enable_remote_services=True,
@@ -62,15 +63,18 @@ def file_to_text(file, additional_files) -> str:
     doc = converter.convert(file).document
     markdown_text = doc.export_to_markdown()
     for pic in doc.pictures:
-        annotation_text = []
-        for annotation in pic.annotations:
-            if not isinstance(annotation, PictureDescriptionData):
-                continue
-            annotation_text.append(annotation.text)
-        annotation_text = "\n".join(annotation_text)
-        annotation_text = re.sub(r"\n+", "\n", annotation_text)
-        image_link = upload_image(pic.image.pil_image)
-        markdown_text = markdown_text.replace("<!-- image -->", f"![{annotation_text}]({image_link})", 1)
+        if pic.image:
+            annotation_text = []
+            for annotation in pic.annotations:
+                if not isinstance(annotation, PictureDescriptionData):
+                    continue
+                annotation_text.append(annotation.text)
+            annotation_text = "\n".join(annotation_text)
+            annotation_text = re.sub(r"\n+", "\n", annotation_text)
+            image_link = upload_image(pic.image.pil_image)
+            markdown_text = markdown_text.replace("<!-- image -->", f"![{annotation_text}]({image_link})", 1)
+        else:
+            markdown_text = markdown_text.replace("<!-- image -->", "", 1)
 
     # If the file is an image and OCR has failed, fallback to using vision model picture description.
     if not markdown_text and Path(file).suffix.lstrip(".").lower() in IMAGE_EXTENSIONS:
