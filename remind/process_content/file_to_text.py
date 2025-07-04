@@ -61,7 +61,7 @@ def file_to_text(file, additional_files: Optional[list] = None) -> str:
         }
     )
     doc = converter.convert(file).document
-    markdown_text = doc.export_to_markdown()
+    markdown_text = doc.export_to_markdown(include_annotations=False)
     for pic in doc.pictures:
         if pic.image:
             annotation_text = []
